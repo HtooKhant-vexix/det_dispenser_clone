@@ -1,0 +1,38 @@
+{
+  "expo": {
+    "name": "Local Installer",
+    "slug": "local-installer",
+    "version": "1.0.0",
+    "orientation": "landscape",
+    "icon": "./assets/adaptive-icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.digital.localinstaller",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "fd5e2ff8-9e6c-49bf-b492-5b432cab9af3"
+      }
+    },
+    "owner": "thuranyi"
+  }
+}
