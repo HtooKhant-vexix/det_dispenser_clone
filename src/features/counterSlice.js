@@ -23,10 +23,17 @@ export const counterSlice = createSlice({
     per: (state, { payload }) => {
       state.col_permit = payload;
     },
+    increace: (state, {payload}) => {
+      console.log('=====payload====================================');
+      console.log(payload);
+      console.log('======payload==============================');
+      state.col_permit[0].price = payload.price;
+      state.col_permit[0].liter = payload.liter;
+    },
   },
 });
 
 // Action creators are generated for each case reducer function
-export const { dSet, nSet,per } = counterSlice.actions;
+export const { dSet, nSet, per, clean,increace } = counterSlice.actions;
 
 export default counterSlice.reducer;

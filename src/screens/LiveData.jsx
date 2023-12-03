@@ -23,10 +23,9 @@ import tw from "twrnc";
 import { useDispatch, useSelector } from "react-redux";
 import ButtonCard from "../components/ButtonCard";
 import Dispenser from "../data/Dispenser";
-import nozzle from "../assets/nozzle.png";
 import WaitingScreen from "./WaitingScreen";
 import PressingBtn from "../components/PressingBtn";
-import { per } from "../features/counter/counterSlice";
+import { increace, per } from "../features/counterSlice";
 
 const LiveData = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -41,11 +40,12 @@ const LiveData = ({ navigation }) => {
   const [revMsg, setRevMsg] = useState();
   const [kyat, setKyat] = useState(3);
   const [apr, setApr] = useState([]);
+  const [mode, setMode] = useState();
 
   const dis = useSelector((state) => state.counter.dis_no);
   const perApr = useSelector((state) => state.counter.col_permit);
   const noz = useSelector((state) => state.counter.noz_no);
-  const nozzles = Dispenser.filter((e) => e.no == dis);
+  const nozzles = Dispenser?.filter((e) => e.no == dis);
   const nozzleData = nozzles[0].nozzle;
 
   const permit = `${noz.length == 1 ? "0" + noz : noz}appro`;
@@ -55,32 +55,37 @@ const LiveData = ({ navigation }) => {
     client.onMessageArrived = onMessageArrived;
   }, []);
 
-  useEffect(() => {
-    if (permit == revMsg) {
-      setWait(false);
-      dispatch(per([...perApr, { revMsg, price: 1000 }]));
-      // setApr([...apr, revMsg]);
-    }
-  }, [revMsg, permit]);
-
   console.log("===========aprrrr=========================");
   console.log(perApr);
   console.log("===========aprrrrr========================");
 
-  const arrTest = perApr.find((e) => e.revMsg == permit);
+  const arrTest = perApr?.find((e) => e == permit);
   console.log("====testtt================================");
   console.log(arrTest);
-  !arrTest ? console.log("true") : console.log("false");
+  // !arrTest ? console.log("true") : console.log("false");
   console.log("====testtt================================");
+
   const onMessageArrived = (message) => {
     const msg = message.payloadString;
     const topic = message.topic;
+    if (message.topic == "detpos/local_server/mode") {
+      dispatch(per([]));
+      console.log("true from live data");
+      setMode(message.payloadString);
+    } else {
+      console.log("not");
+    }
     if (topic == `detpos/local_server/${dis}`) {
       setRevMsg(msg);
     } else {
       console.log("not equal");
     }
   };
+
+  // useEffect(() => {
+  //   // dispatch(per([]));
+  //   console.log("true from live data");
+  // }, [mode]);
   // useEffect(() => {
   //   count &&
   //     client.publish(
@@ -95,7 +100,7 @@ const LiveData = ({ navigation }) => {
     const publishData = () => {
       client.publish(
         `detpos/device/livedata/${dis}`,
-        `${noz.length == 1 ? "0" + noz : noz}L${pcount.liter.toFixed(
+        `${noz.length == 1 ? "0" + noz : noz}L${pcount?.liter?.toFixed(
           3
         )}P${parseFloat(pcount.kyat)}`
       );
@@ -110,130 +115,36 @@ const LiveData = ({ navigation }) => {
     };
   }, [count, pcount]);
 
-  return (
-    <View style={tw`flex-1 justify-center items-center `}>
-      <View style={tw` flex gap-5 ml-[-135px] items-start `}>
-        <View style={tw`flex-row mb-[-20px]`}>
-          <Text style={tw`text-3xl pt-3 font-bold text-gray-500`}>
-            Dispenser :{" "}
-          </Text>
-          <Text style={tw`text-3xl pt-3 text-red-500 ml-3`}>{dis}</Text>
-        </View>
-        <View style={tw`flex-row`}>
-          <Text style={tw`text-3xl pt-3 font-bold text-gray-500`}>
-            Nozzle :{" "}
-          </Text>
-          <Text style={tw`text-3xl pt-3 text-red-500 ml-3`}>{noz}</Text>
-        </View>
-      </View>
-      <View
-        style={tw`flex w-[95%] flex-wrap flex-row gap-3 justify-center items-center`}
-      >
-        <View
-          style={tw` gap-4 rounded-md flex flex-row justify-center items-center py-4 pl-10  pr-10 w-[96%]`}
-        >
-          <View style={tw`flex-col`}>
-            <View style={tw`flex flex-row items-center mb-5 gap-4`}>
-              <View
-                style={tw`pt-6 pb-4  flex border-2  border-gray-700 rounded-md justify-center items-center `}
-              >
-                <Text style={tw`text-2xl pl-6 pr-6 text-gray-700`}>LITERS</Text>
-              </View>
-              <View
-                style={tw`border-2 border-gray-700 rounded-md  pt-6 pb-4 px-16 flex justify-center items-center`}
-              >
-                <Text style={tw`text-2xl text-gray-700`}>KYATS</Text>
-              </View>
-            </View>
-            <View style={tw`flex flex-row gap-4`}>
-              <View
-                style={tw`bg-red-300 bg-gray-700 w-32 h-20 rounded-sm flex justify-center items-center `}
-              >
-                <Text style={tw`text-3xl text-gray-300 pt-5 font-bold`}>
-                  {pcount.liter.toFixed(2)}
-                </Text>
-              </View>
-              <View
-                style={tw`bg-red-300 bg-gray-700 w-50 h-20 rounded-sm flex justify-center items-center`}
-              >
-                <Text style={tw`text-3xl text-gray-300 pt-5 font-bold`}>
-                  {pcount.kyat.toFixed(2)}
-                </Text>
-              </View>
-            </View>
-          </View>
-        </View>
+  useEffect(() => {
+    if (permit == revMsg) {
+      // setWait(false);
+      dispatch(
+        per([...perApr, revMsg])
+        // per([
+        //   ...perApr,
+        //   {
+        //     revMsg: revMsg,
+        //     price: pcount?.kyat?.toFixed(2),
+        //     liter: pcount?.liter?.toFixed(2),
+        //   },
+        // ])
+      );
+      // setApr([...apr, revMsg]);
+    }
+  }, [revMsg, permit]);
+  const fil = perApr.filter((e) => e.revMsg == `${noz}appro`);
+  console.log("=  === fil===================================");
+  console.log(fil[0]);
+  console.log("====================================");
 
-        <View style={tw`flex items-center flex-row w-full justify-around `}>
-          <TouchableOpacity
-            onPress={() => {
-              client.publish("detpos/local_server", `${noz}/D1S1`);
-              navigation.navigate("dispenser");
-            }}
-            style={tw`w-[45%]`}
-          >
-            <View
-              style={tw`bg-[#F7665E] rounded-md pt-5 pb-3 pl-10  pr-10 flex items-center`}
-            >
-              <Text style={tw`text-2xl text-center text-white`}>Cancel</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              client.publish(
-                `detpos/device/Final/${dis}`,
-                `${
-                  noz.length == 1 ? "0" + noz : noz
-                }S2000L${pcount.liter.toFixed(3)}P${parseFloat(
-                  pcount.kyat
-                )}T123.456`
-              );
-              client.publish("detpos/local_server", `${noz}/D1S1`);
-              navigation.navigate("dispenser");
-            }}
-            style={tw``}
-          >
-            <View
-              style={tw`bg-green-500 rounded-md pt-5 pb-3 pl-10  pr-10 flex items-center`}
-            >
-              <Text style={tw`text-2xl text-center text-white`}>Submit</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <PressingBtn
-          onPressIn={() => {
-            console.log(pressTimer), setCount(true);
-            setPressTimer(
-              setInterval(() => {
-                setpCount((prevCount) => ({
-                  ...prevCount,
-                  liter: prevCount.liter + 0.02,
-                  kyat: prevCount.kyat + 20,
-                }));
-              }, 150)
-            );
-          }}
-          onPressOut={() => {
-            clearInterval(pressTimer);
-            setCount(false);
-            setpCount((prevCount) => ({
-              ...prevCount,
-              liter: parseFloat(prevCount.liter.toFixed(2)),
-              kyat: parseFloat(prevCount.kyat.toFixed(2)),
-            }));
-          }}
-        />
-      </View>
-    </View>
-  );
-  // return !arrTest ? (
-  //   <WaitingScreen
-  //     onPress={() => {
-  //       client.publish("detpos/device/req", `${noz}/cancel`);
-  //       navigation.navigate("dispenser");
-  //     }}
-  //   />
-  // ) : (
+  // useEffect(()=>{
+  //   setpCount({
+  //     liter: fil[0]?.liter,
+  //     kyat: fil[0]?.price,
+  //   });
+  // },[])
+
+  // return (
   //   <View style={tw`flex-1 justify-center items-center `}>
   //     <View style={tw` flex gap-5 ml-[-135px] items-start `}>
   //       <View style={tw`flex-row mb-[-20px]`}>
@@ -288,10 +199,10 @@ const LiveData = ({ navigation }) => {
   //       </View>
 
   //       <View style={tw`flex items-center flex-row w-full justify-around `}>
-  //         {/* <TouchableOpacity
+  //         <TouchableOpacity
   //           onPress={() => {
   //             client.publish("detpos/local_server", `${noz}/D1S1`);
-  //             navigation.navigate("Dispenser");
+  //             navigation.navigate("dispenser");
   //           }}
   //           style={tw`w-[45%]`}
   //         >
@@ -300,7 +211,7 @@ const LiveData = ({ navigation }) => {
   //           >
   //             <Text style={tw`text-2xl text-center text-white`}>Cancel</Text>
   //           </View>
-  //         </TouchableOpacity> */}
+  //         </TouchableOpacity>
   //         <TouchableOpacity
   //           onPress={() => {
   //             client.publish(
@@ -349,6 +260,148 @@ const LiveData = ({ navigation }) => {
   //     </View>
   //   </View>
   // );
+  return !arrTest ? (
+    <WaitingScreen
+      onPress={() => {
+        client.publish("detpos/device/req", `${noz}/cancel`);
+        navigation.navigate("dispenser");
+      }}
+    />
+  ) : (
+    <View style={tw`flex-1 justify-center items-center `}>
+      <View style={tw` flex gap-5 ml-[-135px] items-start `}>
+        <View style={tw`flex-row mb-[-20px]`}>
+          <Text style={tw`text-3xl pt-3 font-bold text-gray-500`}>
+            Dispenser :{" "}
+          </Text>
+          <Text style={tw`text-3xl pt-3 text-red-500 ml-3`}>{dis}</Text>
+        </View>
+        <View style={tw`flex-row`}>
+          <Text style={tw`text-3xl pt-3 font-bold text-gray-500`}>
+            Nozzle :{" "}
+          </Text>
+          <Text style={tw`text-3xl pt-3 text-red-500 ml-3`}>{noz}</Text>
+        </View>
+      </View>
+      <View
+        style={tw`flex w-[95%] flex-wrap flex-row gap-3 justify-center items-center`}
+      >
+        <View
+          style={tw` gap-4 rounded-md flex flex-row justify-center items-center py-4 pl-10  pr-10 w-[96%]`}
+        >
+          <View style={tw`flex-col`}>
+            <View style={tw`flex flex-row items-center mb-5 gap-4`}>
+              <View
+                style={tw`pt-6 pb-4  flex border-2  border-gray-700 rounded-md justify-center items-center `}
+              >
+                <Text style={tw`text-2xl pl-6 pr-6 text-gray-700`}>LITERS</Text>
+              </View>
+              <View
+                style={tw`border-2 border-gray-700 rounded-md  pt-6 pb-4 px-16 flex justify-center items-center`}
+              >
+                <Text style={tw`text-2xl text-gray-700`}>KYATS</Text>
+              </View>
+            </View>
+            <View style={tw`flex flex-row gap-4`}>
+              <View
+                style={tw`bg-red-300 bg-gray-700 w-32 h-20 rounded-sm flex justify-center items-center `}
+              >
+                <Text style={tw`text-3xl text-gray-300 pt-5 font-bold`}>
+                  {pcount?.liter?.toFixed(2)}
+                </Text>
+              </View>
+              <View
+                style={tw`bg-red-300 bg-gray-700 w-50 h-20 rounded-sm flex justify-center items-center`}
+              >
+                <Text style={tw`text-3xl text-gray-300 pt-5 font-bold`}>
+                  {pcount?.kyat?.toFixed(2)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        <View style={tw`flex items-center flex-row w-full justify-around `}>
+          <TouchableOpacity
+            onPress={() => {
+              client.publish("detpos/local_server", `${noz}/D1S1`);
+              navigation.navigate("Dispenser");
+              dispatch(per(perApr?.filter((e) => e != `${noz}appro`)));
+            }}
+            style={tw`w-[45%]`}
+          >
+            <View
+              style={tw`bg-[#F7665E] rounded-md pt-5 pb-3 pl-10  pr-10 flex items-center`}
+            >
+              <Text style={tw`text-2xl text-center text-white`}>Cancel</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              client.publish(
+                `detpos/device/Final/${dis}`,
+                `${
+                  noz.length == 1 ? "0" + noz : noz
+                }S2000L${pcount?.liter?.toFixed(3)}P${parseFloat(
+                  pcount.kyat
+                )}T123.456`
+              );
+              client.publish("detpos/local_server", `${noz}/D1S1`);
+              navigation.navigate("nozzle");
+              dispatch(per(perApr?.filter((e) => e != `${noz}appro`)));
+            }}
+            style={tw``}
+          >
+            <View
+              style={tw`bg-green-500 rounded-md pt-5 pb-3 pl-10  pr-10 flex items-center`}
+            >
+              <Text style={tw`text-2xl text-center text-white`}>Submit</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+        <PressingBtn
+          onPressIn={() => {
+            console.log(pressTimer), setCount(true);
+            setPressTimer(
+              setInterval(() => {
+                setpCount((prevCount) => ({
+                  ...prevCount,
+                  liter: prevCount.liter + 0.02,
+                  kyat: prevCount.kyat + 20,
+                }));
+                // dispatch(increace({
+                //   liter: perApr.liter + 0.02,
+                //   kyat: perApr.kyat +20,
+                // }))
+              }, 150)
+            );
+          }}
+          onPressOut={() => {
+            clearInterval(pressTimer);
+            setCount(false);
+            setpCount((prevCount) => ({
+              ...prevCount,
+              liter: parseFloat(prevCount.liter.toFixed(2)),
+              kyat: parseFloat(prevCount.kyat.toFixed(2)),
+            }));
+            // dispatch(
+            //   increace({
+            //     liter: pcount?.liter.toFixed(2),
+            //     kyat: pcount.kyat.toFixed(2),
+            //   })
+            // );
+            // dispatch(
+            //   increace({
+            //     price: pcount.kyat.toFixed(2),
+            //     liter: pcount.liter.toFixed(2),
+            //     index: parseInt(noz),
+            //   })
+            // );
+          }}
+        />
+      </View>
+    </View>
+  );
 };
 
 export default LiveData;

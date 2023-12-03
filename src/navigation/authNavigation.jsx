@@ -1,17 +1,16 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import Whole from '../../screens/Whole';
-import Nozzle from '../../screens/Nozzle';
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Whole from "../screens/Whole";
+import Nozzle from "../screens/Nozzle";
 // import Whole from "./screens/Whole";
 // import Nozzle from "./screens/Nozzle";
-import LiveData from "../../screens/LiveData";
-
-
+import LiveData from "../screens/LiveData";
+import Live from "../screens/Live";
 
 function AuthNavigation() {
-    const Stack = createNativeStackNavigator();
+  const Stack = createNativeStackNavigator();
   return (
     <Stack.Navigator initialRouteName="dispenser">
-      {/* <Stack.Screen name="live" component={Live} /> */}
+      <Stack.Screen name="live" component={Live} />
       <Stack.Screen name="dispenser" component={Whole} />
       <Stack.Screen name="nozzle" component={Nozzle} />
       <Stack.Screen name="liveData" component={LiveData} />
@@ -20,4 +19,4 @@ function AuthNavigation() {
   );
 }
 
-export default AuthNavigation
+export default AuthNavigation;

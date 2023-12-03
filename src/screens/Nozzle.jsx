@@ -4,8 +4,8 @@ import tw from "twrnc";
 import { useDispatch, useSelector } from "react-redux";
 import ButtonCard from "../components/ButtonCard";
 import Dispenser from "../data/Dispenser";
-import nozzle from "../assets/nozzle.png";
-import { nSet } from "../features/counter/counterSlice";
+import nozzle from "../../assets/nozzle.png";
+import { nSet } from "../features/counterSlice";
 import Paho from "paho-mqtt";
 
 // client = new Paho.Client(
@@ -19,7 +19,7 @@ const Nozzle = ({ navigation }) => {
   const dis = useSelector((state) => state.counter.dis_no);
   console.log(dis);
   const dispatch = useDispatch();
-  const nozzles = Dispenser.filter((e) => e.no == dis);
+  const nozzles = Dispenser?.filter((e) => e.no == dis);
   const nozzleData = nozzles[0].nozzle;
 
   // function onMessage(message) {
@@ -67,7 +67,7 @@ const Nozzle = ({ navigation }) => {
               <ButtonCard
                 n_no={data}
                 onPress={() => {
-                  client.publish(`detpos/device/permit/${dis}`, data);
+                  client.publish(`detpos/device/permit/${dis}`, `${data}permit`);
                   dispatch(nSet(data));
                   console.log(data);
                   navigation.navigate("liveData");

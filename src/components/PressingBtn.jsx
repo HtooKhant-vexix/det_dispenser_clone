@@ -1,7 +1,7 @@
 import { View, Text, TouchableHighlight, Image } from "react-native";
 import React, { useState } from "react";
 import tw from "twrnc";
-import nozzle from "../assets/nozzle.png";
+import nozzle from "../../assets/nozzle.png";
 
 const PressingBtn = ({onPressIn,onPressOut}) => {
 
